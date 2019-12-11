@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>vee-validate-test</title>
+  <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css" />
+</head>
+<body>
+  <div id="app" class="container">
+    <div class="row">
+      <div class="col-md-4 col-md-offset-4">
+        <div class="login-panel panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">免費註冊</h3>
+          </div>
+          <div class="panel-body">
+            <validation-observer v-slot="{ invalid }">
+              <form role="form" @submit.prevent="onSubmit">
+                <fieldset>
+                  <validation-provider name="暱稱" rules="required|max:6|checkAccountNameExist" v-slot="{ errors }">
+                    <div class="form-group" :class="{ 'has-success': errors[0], 'has-error': errors[0], 'has-feedback': errors[0] }">
+                      <input v-model="userName" class="form-control" placeholder="Name" autofocus />
+                      <span class="help-block">{{ errors[0] }}</span>
+                      <span v-if="errors[0]" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                      <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
+                    </div>
+                  </validation-provider>
+                  <validation-provider name="電子信箱" rules="required|email|checkAccountEmailExists" v-slot="{ errors }">
+                    <div class="form-group" :class="{ 'has-error': errors[0], 'has-feedback': errors[0] }">
+                      <input type="email" v-model="userEmail" class="form-control" placeholder="E-mail" />
+                      <span class="help-block">{{ errors[0] }}</span>
+                      <span v-if="errors[0]" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                      <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
+                    </div>
+                  </validation-provider>
+                  <validation-provider name="密碼" rules="required" v-slot="{ errors }" vid="userPassword">
+                    <div class="form-group" :class="{ 'has-error': errors[0], 'has-feedback': errors[0] }">
+                      <input type="password" v-model="userPassword" class="form-control" placeholder="Password" />
+                      <span class="help-block">{{ errors[0] }}</span>
+                      <span v-if="errors[0]" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                      <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
+                    </div>
+                  </validation-provider>
+                  <validation-provider name="密碼" rules="confirmed:userPassword" v-slot="{ errors }">
+                    <div class="form-group" :class="{ 'has-error': errors[0], 'has-feedback': errors[0] }">
+                      <input type="password" v-model="userConfirmPassword" class="form-control" placeholder="Confirm Password" />
+                      <span class="help-block">{{ errors[0] }}</span>
+                      <span v-if="errors[0]" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
+                      <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
+                    </div>
+                  </validation-provider>
+
+                  <input type="submit" class="btn btn-lg btn-success btn-block" value="註冊" :disabled="invalid">
+                </fieldset>
+              </form>
+            </validation-observer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="./node_modules/vue/dist/vue.js"></script>
+  <script src="./node_modules/vee-validate/dist/vee-validate.full.js"></script>
+  <script src="./node_modules/axios/dist/axios.min.js"></script>
+  <script>
+    Vue.component('validation-observer', VeeValidate.ValidationObserver);
+    Vue.component('validation-provider', VeeValidate.ValidationProvider);
+    VeeValidate.localize('zh-TW', {
+      "code": "zh_TW",
+      "messages": {
+        "alpha": "{_field_}須以英文組成",
+        "alpha_dash": "{_field_}須以英數、斜線及底線組成",
+        "alpha_num": "{_field_}須以英數組成",
+        "alpha_spaces": "{_field_}須以英文及空格組成",
+        "between": "{_field_}須介於 {min} 至 {max}之間",
+        "confirmed": " {_field_}並不相符",
+        "digits": "{_field_}須為 {length} 位數字",
+        "dimensions": "{_field_}圖片尺寸不正確。須為 {width} x {height} 像素",
+        "email": "{_field_}須為有效的電子信箱",
+        "excluded": "{_field_}的選項無效",
+        "ext": "{_field_}須為有效的檔案",
+        "image": "{_field_}須為圖片",
+        "oneOf": "{_field_}的選項無效",
+        "integer": "{_field_}須為整數",
+        "length": "{_field_}的長度須為 {length}",
+        "max": "{_field_}不能大於 {length} 個字元",
+        "max_value": "{_field_}不得大於 {max}",
+        "mimes": "{_field_}須為有效的檔案類型",
+        "min": "{_field_}不能小於 {length} 個字元",
+        "min_value": "{_field_}不得小於 {min}",
+        "numeric": "{_field_}須為數字",
+        "regex": "{_field_}的格式錯誤",
+        "required": "{_field_}為必填",
+        "required_if": "{_field_}為必填",
+        "size": "{_field_}的檔案須小於 {size}KB"
+      },
+    });
+
+    VeeValidate.extend('checkAccountNameExist', {
+      validate(value) {
+        return new Promise((resolve) => {
+          axios({
+            url: 'https://httpbin.org/json',
+            method: 'GET'
+          })
+            .then((response) => {
+              resolve({
+                valid: !!response.data,
+              });
+            });
+        });
+      },
+      message: '你輸入的暱稱已被使用',
+    });
+
+    VeeValidate.extend('checkAccountEmailExists', {
+      validate(value) {
+        return new Promise((resolve) => {
+          axios({
+            url: 'https://httpbin.org/json',
+            method: 'GET'
+          })
+            .then((response) => {
+              resolve({
+                valid: !!response.data,
+              });
+            });
+        });
+      },
+      message: '你輸入的信箱已被使用',
+    });
+
+    const app = new Vue({
+      el: '#app',
+      data: {
+        userName: '',
+        userEmail: '',
+        userPassword: '',
+        userConfirmPassword: '',
+      },
+      methods: {
+        onSubmit() {
+          alert('Form has been submitted!');
+        },
+      },
+    });
+  </script>
+</body>
+</html>
