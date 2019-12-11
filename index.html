@@ -6,9 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>vee-validate-test</title>
   <link rel="stylesheet" href="./lib/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="./node_modules/vue-loading-overlay/dist/vue-loading.css" />
 </head>
 <body>
   <div id="app" class="container">
+    <loading :active.sync="isLoading"></loading>
     <div class="row">
       <div class="col-md-4 col-md-offset-4">
         <div class="login-panel panel panel-default">
@@ -22,7 +24,9 @@
                   <validation-provider name="暱稱" rules="required|max:6|checkAccountNameExist" v-slot="{ errors }">
                     <div class="form-group" :class="{ 'has-success': errors[0], 'has-error': errors[0], 'has-feedback': errors[0] }">
                       <input v-model="userName" class="form-control" placeholder="Name" autofocus />
-                      <span class="help-block">{{ errors[0] }}</span>
+                      <span class="help-block" style="display: none;" :style="{ display: errors[0] ? 'block' : 'none' }">
+                        {{ errors[0] }}
+                      </span>
                       <span v-if="errors[0]" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
                       <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
                     </div>
@@ -30,7 +34,9 @@
                   <validation-provider name="電子信箱" rules="required|email|checkAccountEmailExists" v-slot="{ errors }">
                     <div class="form-group" :class="{ 'has-error': errors[0], 'has-feedback': errors[0] }">
                       <input type="email" v-model="userEmail" class="form-control" placeholder="E-mail" />
-                      <span class="help-block">{{ errors[0] }}</span>
+                      <span class="help-block" style="display: none;" :style="{ display: errors[0] ? 'block' : 'none' }">
+                        {{ errors[0] }}
+                      </span>
                       <span v-if="errors[0]" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
                       <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
                     </div>
@@ -38,7 +44,9 @@
                   <validation-provider name="密碼" rules="required" v-slot="{ errors }" vid="userPassword">
                     <div class="form-group" :class="{ 'has-error': errors[0], 'has-feedback': errors[0] }">
                       <input type="password" v-model="userPassword" class="form-control" placeholder="Password" />
-                      <span class="help-block">{{ errors[0] }}</span>
+                      <span class="help-block" style="display: none;" :style="{ display: errors[0] ? 'block' : 'none' }">
+                        {{ errors[0] }}
+                      </span>
                       <span v-if="errors[0]" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
                       <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
                     </div>
@@ -46,7 +54,9 @@
                   <validation-provider name="密碼" rules="confirmed:userPassword" v-slot="{ errors }">
                     <div class="form-group" :class="{ 'has-error': errors[0], 'has-feedback': errors[0] }">
                       <input type="password" v-model="userConfirmPassword" class="form-control" placeholder="Confirm Password" />
-                      <span class="help-block">{{ errors[0] }}</span>
+                      <span class="help-block" style="display: none;" :style="{ display: errors[0] ? 'block' : 'none' }">
+                        {{ errors[0] }}
+                      </span>
                       <span v-if="errors[0]" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
                       <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
                     </div>
@@ -64,8 +74,11 @@
   
   <script src="./node_modules/vue/dist/vue.js"></script>
   <script src="./node_modules/vee-validate/dist/vee-validate.full.js"></script>
+  <script src="./node_modules/vue-loading-overlay/dist/vue-loading.min.js"></script>
   <script src="./node_modules/axios/dist/axios.min.js"></script>
   <script>
+    Vue.use(VueLoading);
+    Vue.component('loading', VueLoading);
     Vue.component('validation-observer', VeeValidate.ValidationObserver);
     Vue.component('validation-provider', VeeValidate.ValidationProvider);
     VeeValidate.localize('zh-TW', {
@@ -140,11 +153,16 @@
         userEmail: '',
         userPassword: '',
         userConfirmPassword: '',
+
+        isLoading: true,
       },
       methods: {
         onSubmit() {
           alert('Form has been submitted!');
         },
+      },
+      mounted() {
+        this.isLoading = false;
       },
     });
   </script>
