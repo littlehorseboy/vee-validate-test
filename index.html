@@ -51,7 +51,7 @@
                       <span v-if="errors[0]" id="inputError2Status" class="sr-only">(error)</span>
                     </div>
                   </validation-provider>
-                  <validation-provider name="密碼" rules="confirmed:userPassword" v-slot="{ errors }">
+                  <validation-provider name="密碼" rules="required|confirmed:userPassword" v-slot="{ errors }">
                     <div class="form-group" :class="{ 'has-error': errors[0], 'has-feedback': errors[0] }">
                       <input type="password" v-model="userConfirmPassword" class="form-control" placeholder="Confirm Password" />
                       <span class="help-block" style="display: none;" :style="{ display: errors[0] ? 'block' : 'none' }">
