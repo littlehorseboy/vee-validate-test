@@ -18,8 +18,8 @@
             <h3 class="panel-title">免費註冊</h3>
           </div>
           <div class="panel-body">
-            <validation-observer v-slot="{ invalid }">
-              <form role="form" @submit.prevent="onSubmit">
+            <validation-observer v-slot="{ invalid, handleSubmit }">
+              <form role="form" @submit.prevent="handleSubmit(onSubmit)">
                 <fieldset>
                   <validation-provider name="暱稱" rules="required|max:6|checkAccountNameExist" v-slot="{ errors }">
                     <div class="form-group" :class="{ 'has-success': errors[0], 'has-error': errors[0], 'has-feedback': errors[0] }">
